@@ -42,7 +42,7 @@ class UpnpDiscoveryServer {
       } on SocketException {
         try {
           withAddress(_v6Multicast);
-        } on OSError {
+        } catch(_) {
         }
       }
     }
@@ -79,7 +79,7 @@ class UpnpDiscoveryServer {
               }
             }
           }
-        } catch (e) {
+        } catch (_) {
         }
       }
     });

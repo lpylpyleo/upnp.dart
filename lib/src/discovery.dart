@@ -290,9 +290,7 @@ class DiscoveredDevice {
     try {
       final request = await UpnpCommon.httpClient
           .getUrl(Uri.parse(location!))
-          .timeout(const Duration(seconds: 5),
-              onTimeout:
-                  (() => null) as FutureOr<HttpClientRequest> Function()?);
+          .timeout(const Duration(seconds: 5));
 
       response = await request.close();
     } catch (_) {

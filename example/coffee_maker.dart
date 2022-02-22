@@ -3,7 +3,7 @@ import 'package:upnp2/upnp.dart';
 void main() {
   final discover = DeviceDiscoverer();
 
-  discover.getDevices(type: CommonDevices.WEMO).then((devices) {
+  discover.getDevices(type: CommonDevices.wemo).then((devices) {
     return devices.where((it) => it.modelName == 'CoffeeMaker');
   }).then((devices) {
     for (var device in devices) {

@@ -51,10 +51,14 @@ class ServiceDescription {
       throw Exception('Unable to fetch service, no SCPD URL.');
     }
 
-    final request = await UpnpCommon.httpClient
-        .getUrl(Uri.parse(scpdUrl!))
-        .timeout(const Duration(seconds: 5),
-            onTimeout: (() => null) as FutureOr<HttpClientRequest> Function()?);
+    HttpClientRequest request;
+    try {
+      request = await UpnpCommon.httpClient
+          .getUrl(Uri.parse(scpdUrl!))
+          .timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      return Future.value(null);
+    }
 
     final response = await request.close();
 

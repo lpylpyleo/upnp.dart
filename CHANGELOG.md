@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.5
+- fix code of null safety migration (we need to make some tests)
+- fix use of constant in coffe_make.dart
+
 ## 3.0.4
 
 - add a lot of documentation

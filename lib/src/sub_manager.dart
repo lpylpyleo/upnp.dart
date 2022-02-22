@@ -211,9 +211,7 @@ class StateSubscription {
     final id = _getId();
     final url = await _getCallbackUrl(uri, id);
     if (url != lastCallbackUrl) {
-      await _unsub().timeout(const Duration(seconds: 10), onTimeout: () {
-        return null;
-      });
+      await _unsub().timeout(const Duration(seconds: 10));
       await _sub();
       return;
     }
@@ -226,14 +224,16 @@ class StateSubscription {
     request.headers.set('SID', _lastSid!);
     request.headers.set('HOST', '${request.uri.host}:${request.uri.port}');
 
-    final HttpClientResponse? response = await request.close().timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            return null;
-          } as FutureOr<HttpClientResponse> Function()?,
-        );
+    HttpClientResponse response;
+    try {
+      response = await request.close().timeout(
+        const Duration(seconds: 10),
+      );
+    } on TimeoutException {
+      return;
+    }
 
-    if (response?.statusCode != HttpStatus.ok) {
+    if (response.statusCode != HttpStatus.ok) {
       await _controller!.close();
       return;
     } else {
@@ -257,10 +257,7 @@ class StateSubscription {
     request.headers.set('ACCEPT', '*/*');
     request.headers.set('SID', _lastSid!);
 
-    final response = await request.close().timeout(const Duration(seconds: 10),
-        onTimeout: () {
-          return null;
-        } as FutureOr<HttpClientResponse> Function()?);
+    final response = await request.close().timeout(const Duration(seconds: 10));
 
     await response.drain();
 
