@@ -1,7 +1,7 @@
 import "dart:async";
-import "package:upnp/upnp.dart";
 
-import "package:upnp/src/utils.dart";
+import "package:upnp2/src/utils.dart";
+import "package:upnp2/upnp.dart";
 
 main() async {
   var discover = new DeviceDiscoverer();
