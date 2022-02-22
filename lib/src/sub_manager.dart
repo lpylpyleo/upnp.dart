@@ -2,26 +2,26 @@ part of upnp;
 
 class StateSubscriptionManager {
   HttpServer? server;
-  Map<String, StateSubscription> _subs = {};
+  final Map<String, StateSubscription> _subs = {};
 
-  init() async {
+  Future<void> init() async {
     await close();
 
-    server = await HttpServer.bind("0.0.0.0", 0);
+    server = await HttpServer.bind('0.0.0.0', 0);
 
     server!.listen((HttpRequest request) {
-      String id = request.uri.path.substring(1);
+      final String id = request.uri.path.substring(1);
 
       if (_subs.containsKey(id)) {
         _subs[id]!.deliver(request);
-      } else if (request.uri.path == "/_list") {
+      } else if (request.uri.path == '/_list') {
         request.response
-          ..writeln(_subs.keys.join("\n"))
+          ..writeln(_subs.keys.join('\n'))
           ..close();
-      } else if (request.uri.path == "/_state") {
-        var out = "";
+      } else if (request.uri.path == '/_state') {
+        var out = '';
         for (String sid in _subs.keys) {
-          out += "${sid}: ${_subs[sid]!._lastValue}\n";
+          out += '$sid: ${_subs[sid]!._lastValue}\n';
         }
         request.response
           ..write(out)
@@ -33,25 +33,25 @@ class StateSubscriptionManager {
     }, onError: (e) {});
   }
 
-  close() async {
+  Future<void> close() async {
     for (String key in _subs.keys.toList()) {
       _subs[key]!._done();
       _subs.remove(key);
     }
 
     if (server != null) {
-      server!.close(force: true);
+      await server!.close(force: true);
       server = null;
     }
   }
 
   Stream<dynamic> subscribeToVariable(StateVariable v) {
-    var id = v.getGenericId();
+    final id = v.getGenericId();
     StateSubscription? sub;
     if (_subs.containsKey(id)) {
       sub = _subs[id];
     } else {
-      sub = _subs[id] = new StateSubscription();
+      sub = _subs[id] = StateSubscription();
       sub.eventUrl = v.service.eventSubUrl;
       sub.lastStateVariable = v;
       sub.manager = this;
@@ -62,10 +62,10 @@ class StateSubscriptionManager {
   }
 
   Stream<dynamic> subscribeToService(Service service) {
-    var id = sha256.convert(utf8.encode(service.eventSubUrl!)).toString();
+    final id = sha256.convert(utf8.encode(service.eventSubUrl!)).toString();
     StateSubscription? sub = _subs[id];
     if (sub == null) {
-      sub = _subs[id] = new StateSubscription();
+      sub = _subs[id] = StateSubscription();
       sub.eventUrl = service.eventSubUrl;
       sub.manager = this;
       sub.init();
@@ -76,11 +76,11 @@ class StateSubscriptionManager {
 
 class InternalNetworkUtils {
   static Future<String> getMostLikelyHost(Uri uri) async {
-    var parts = uri.host.split(".");
-    var interfaces = await NetworkInterface.list();
+    final parts = uri.host.split('.');
+    final interfaces = await NetworkInterface.list();
 
     String? calc(int skip) {
-      var prefix = parts.take(parts.length - skip).join(".") + ".";
+      final prefix = parts.take(parts.length - skip).join('.') + '.';
 
       for (NetworkInterface interface in interfaces) {
         for (InternetAddress addr in interface.addresses) {
@@ -94,7 +94,7 @@ class InternalNetworkUtils {
     }
 
     for (var i = 1; i <= 3; i++) {
-      var ip = calc(i);
+      final ip = calc(i);
       if (ip != null) {
         return ip;
       }
@@ -105,7 +105,7 @@ class InternalNetworkUtils {
 }
 
 class StateSubscription {
-  static int REFRESH = 30;
+  static int refresh = 30;
 
   late StateSubscriptionManager manager;
   StateVariable? lastStateVariable;
@@ -119,7 +119,7 @@ class StateSubscription {
   dynamic _lastValue;
 
   void init() {
-    _controller = new StreamController<dynamic>.broadcast(
+    _controller = StreamController<dynamic>.broadcast(
         onListen: () async {
           try {
             await _sub();
@@ -130,27 +130,27 @@ class StateSubscription {
         onCancel: () => _unsub());
   }
 
-  deliver(HttpRequest request) async {
-    var content =
+  Future<void> deliver(HttpRequest request) async {
+    final content =
         utf8.decode(await request.fold(<int>[], (List<int> a, List<int> b) {
       return a..addAll(b);
     }));
-    request.response.close();
+    await request.response.close();
 
-    var doc = XmlDocument.parse(content);
-    var props = doc.rootElement.children.where((x) => x is XmlElement).toList();
-    var map = <String, dynamic>{};
-    for (XmlElement prop in props as Iterable<XmlElement>) {
+    final doc = XmlDocument.parse(content);
+    final props = doc.rootElement.children.whereType<XmlElement>().toList();
+    final map = <String, dynamic>{};
+    for (XmlElement prop in props) {
       if (prop.children.isEmpty) {
         continue;
       }
 
-      XmlElement child =
+      final XmlElement child =
           prop.children.firstWhere((x) => x is XmlElement) as XmlElement;
-      String p = child.name.local;
+      final String p = child.name.local;
 
       if (lastStateVariable != null && lastStateVariable!.name == p) {
-        var value = XmlUtils.asRichValue(child.text);
+        final value = XmlUtils.asRichValue(child.text);
         _controller!.add(value);
         _lastValue = value;
         return;
@@ -174,42 +174,42 @@ class StateSubscription {
   }
 
   Future _sub() async {
-    var id = _getId();
+    final id = _getId();
 
-    var uri = Uri.parse(eventUrl!);
+    final uri = Uri.parse(eventUrl!);
 
-    var request = await UpnpCommon.httpClient.openUrl("SUBSCRIBE", uri);
+    final request = await UpnpCommon.httpClient.openUrl('SUBSCRIBE', uri);
 
-    var url = await _getCallbackUrl(uri, id);
+    final url = await _getCallbackUrl(uri, id);
     lastCallbackUrl = url;
 
-    request.headers.set("User-Agent", "UPNP.dart/1.0");
-    request.headers.set("ACCEPT", "*/*");
-    request.headers.set("CALLBACK", "<${url}>");
-    request.headers.set("NT", "upnp:event");
-    request.headers.set("TIMEOUT", "Second-${REFRESH}");
-    request.headers.set("HOST", "${request.uri.host}:${request.uri.port}");
+    request.headers.set('User-Agent', 'UPNP.dart/1.0');
+    request.headers.set('ACCEPT', '*/*');
+    request.headers.set('CALLBACK', '<$url>');
+    request.headers.set('NT', 'upnp:event');
+    request.headers.set('TIMEOUT', 'Second-$refresh');
+    request.headers.set('HOST', '${request.uri.host}:${request.uri.port}');
 
-    var response = await request.close();
-    response.drain();
+    final response = await request.close();
+    await response.drain();
 
     if (response.statusCode != HttpStatus.ok) {
-      throw new Exception("Failed to subscribe.");
+      throw Exception('Failed to subscribe.');
     }
 
-    _lastSid = response.headers.value("SID");
+    _lastSid = response.headers.value('SID');
 
-    _timer = new Timer(new Duration(seconds: REFRESH), () {
+    _timer = Timer(Duration(seconds: refresh), () {
       _timer = null;
       _refresh();
     });
   }
 
   Future _refresh() async {
-    var uri = Uri.parse(eventUrl!);
+    final uri = Uri.parse(eventUrl!);
 
-    var id = _getId();
-    var url = await _getCallbackUrl(uri, id);
+    final id = _getId();
+    final url = await _getCallbackUrl(uri, id);
     if (url != lastCallbackUrl) {
       await _unsub().timeout(const Duration(seconds: 10), onTimeout: () {
         return null;
@@ -218,55 +218,51 @@ class StateSubscription {
       return;
     }
 
-    var request = await UpnpCommon.httpClient.openUrl("SUBSCRIBE", uri);
+    final request = await UpnpCommon.httpClient.openUrl('SUBSCRIBE', uri);
 
-    request.headers.set("User-Agent", "UPNP.dart/1.0");
-    request.headers.set("ACCEPT", "*/*");
-    request.headers.set("TIMEOUT", "Second-${REFRESH}");
-    request.headers.set("SID", _lastSid!);
-    request.headers.set("HOST", "${request.uri.host}:${request.uri.port}");
+    request.headers.set('User-Agent', 'UPNP.dart/1.0');
+    request.headers.set('ACCEPT', '*/*');
+    request.headers.set('TIMEOUT', 'Second-$refresh');
+    request.headers.set('SID', _lastSid!);
+    request.headers.set('HOST', '${request.uri.host}:${request.uri.port}');
 
-    HttpClientResponse? response = await request.close().timeout(
+    final HttpClientResponse? response = await request.close().timeout(
           const Duration(seconds: 10),
           onTimeout: () {
             return null;
           } as FutureOr<HttpClientResponse> Function()?,
         );
 
-    if (response != null) {
-      if (response.statusCode != HttpStatus.ok) {
-        _controller!.close();
-        return;
-      } else {
-        _timer = new Timer(new Duration(seconds: REFRESH), () {
-          _timer = null;
-          _refresh();
-        });
-      }
+    if (response?.statusCode != HttpStatus.ok) {
+      await _controller!.close();
+      return;
+    } else {
+      _timer = Timer(Duration(seconds: refresh), () {
+        _timer = null;
+        _refresh();
+      });
     }
   }
 
   Future<String> _getCallbackUrl(Uri uri, String id) async {
-    var host = await InternalNetworkUtils.getMostLikelyHost(uri);
-    return "http://${host}:${manager.server!.port}/${id}";
+    final host = await InternalNetworkUtils.getMostLikelyHost(uri);
+    return 'http://$host:${manager.server!.port}/$id';
   }
 
-  Future _unsub([bool close = false]) async {
-    var request = await UpnpCommon.httpClient
-        .openUrl("UNSUBSCRIBE", Uri.parse(eventUrl!));
+  Future _unsub() async {
+    final request = await UpnpCommon.httpClient
+        .openUrl('UNSUBSCRIBE', Uri.parse(eventUrl!));
 
-    request.headers.set("User-Agent", "UPNP.dart/1.0");
-    request.headers.set("ACCEPT", "*/*");
-    request.headers.set("SID", _lastSid!);
+    request.headers.set('User-Agent', 'UPNP.dart/1.0');
+    request.headers.set('ACCEPT', '*/*');
+    request.headers.set('SID', _lastSid!);
 
-    var response = await request.close().timeout(const Duration(seconds: 10),
+    final response = await request.close().timeout(const Duration(seconds: 10),
         onTimeout: () {
           return null;
         } as FutureOr<HttpClientResponse> Function()?);
 
-    if (response != null) {
-      response.drain();
-    }
+    await response.drain();
 
     if (_timer != null) {
       _timer!.cancel();
@@ -275,13 +271,9 @@ class StateSubscription {
   }
 
   void _done() {
-    if (_timer != null) {
-      _timer!.cancel();
-      _timer = null;
-    }
+    _timer?.cancel();
+    _timer = null;
 
-    if (_controller != null) {
-      _controller!.close();
-    }
+    _controller?.close();
   }
 }

@@ -1,14 +1,14 @@
-import "package:upnp2/upnp.dart";
+import 'package:upnp2/upnp.dart';
 
 main() async {
-  var disc = new DeviceDiscoverer();
+  final disc = DeviceDiscoverer();
   await disc.start(ipv6: false);
   disc.quickDiscoverClients().listen((client) async {
     try {
-      var dev = await client.getDevice();
-      print("${dev!.friendlyName}: ${dev.url}");
+      final dev = await client.getDevice();
+      print('${dev!.friendlyName}: ${dev.url}');
     } catch (e, stack) {
-      print("ERROR: ${e} - ${client.location}");
+      print('ERROR: $e - ${client.location}');
       print(stack);
     }
   });

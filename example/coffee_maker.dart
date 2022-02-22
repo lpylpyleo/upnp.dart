@@ -1,24 +1,24 @@
-import "package:upnp2/upnp.dart";
+import 'package:upnp2/upnp.dart';
 
 void main() {
-  var discover = new DeviceDiscoverer();
+  final discover = DeviceDiscoverer();
 
   discover.getDevices(type: CommonDevices.WEMO).then((devices) {
-    return devices.where((it) => it.modelName == "CoffeeMaker");
+    return devices.where((it) => it.modelName == 'CoffeeMaker');
   }).then((devices) {
     for (var device in devices) {
       Service? service;
-      device.getService("urn:Belkin:service:deviceevent:1").then((_) {
+      device.getService('urn:Belkin:service:deviceevent:1').then((_) {
         service = _;
-        return service!.invokeAction("GetAttributes", {});
+        return service!.invokeAction('GetAttributes', {});
       }).then((result) {
-        var attributes = WemoHelper.parseAttributes(result["attributeList"]!);
-        var brewing = attributes["Brewing"];
-        var brewed = attributes["Brewed"];
-        var mode = attributes["Mode"];
-        print("Mode: ${mode}");
-        print("Brewing: ${brewing}");
-        print("Brewed: ${brewed}");
+        final attributes = WemoHelper.parseAttributes(result['attributeList']!);
+        final brewing = attributes['Brewing'];
+        final brewed = attributes['Brewed'];
+        final mode = attributes['Mode'];
+        print('Mode: $mode');
+        print('Brewing: $brewing');
+        print('Brewed: $brewed');
       });
     }
   });

@@ -1,13 +1,13 @@
 part of upnp;
 
-const String _SOAP_BODY = """
+const String _soapBody = '''
 <?xml version="1.0" encoding="utf-8"?>
 <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
   <s:Body>
   {param}
   </s:Body>
 </s:Envelope>
-""";
+''';
 
 class ServiceDescription {
   String? type;
@@ -17,16 +17,16 @@ class ServiceDescription {
   String? scpdUrl;
 
   ServiceDescription.fromXml(Uri uriBase, XmlElement service) {
-    type = XmlUtils.getTextSafe(service, "serviceType")!.trim();
-    id = XmlUtils.getTextSafe(service, "serviceId")!.trim();
+    type = XmlUtils.getTextSafe(service, 'serviceType')!.trim();
+    id = XmlUtils.getTextSafe(service, 'serviceId')!.trim();
     controlUrl = uriBase
-        .resolve(XmlUtils.getTextSafe(service, "controlURL")!.trim())
+        .resolve(XmlUtils.getTextSafe(service, 'controlURL')!.trim())
         .toString();
     eventSubUrl = uriBase
-        .resolve(XmlUtils.getTextSafe(service, "eventSubURL")!.trim())
+        .resolve(XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
         .toString();
 
-    var m = XmlUtils.getTextSafe(service, "SCPDURL");
+    final m = XmlUtils.getTextSafe(service, 'SCPDURL');
 
     if (m != null) {
       scpdUrl = uriBase.resolve(m).toString();
@@ -35,15 +35,15 @@ class ServiceDescription {
 
   Future<Service?> getService([Device? device]) async {
     if (scpdUrl == null) {
-      throw new Exception("Unable to fetch service, no SCPD URL.");
+      throw Exception('Unable to fetch service, no SCPD URL.');
     }
 
-    var request = await UpnpCommon.httpClient
+    final request = await UpnpCommon.httpClient
         .getUrl(Uri.parse(scpdUrl!))
         .timeout(const Duration(seconds: 5),
             onTimeout: (() => null) as FutureOr<HttpClientRequest> Function()?);
 
-    var response = await request.close();
+    final response = await request.close();
 
     if (response.statusCode != 200) {
       return null;
@@ -54,36 +54,36 @@ class ServiceDescription {
     try {
       var content =
           await response.cast<List<int>>().transform(utf8.decoder).join();
-      content = content.replaceAll("\u00EF\u00BB\u00BF", "");
+      content = content.replaceAll('\u00EF\u00BB\u00BF', '');
       doc = XmlDocument.parse(content).rootElement;
     } catch (e) {
       return null;
     }
 
-    var actionList = doc.findElements("actionList");
-    var varList = doc.findElements("serviceStateTable");
-    var acts = <Action>[];
+    final actionList = doc.findElements('actionList');
+    final varList = doc.findElements('serviceStateTable');
+    final acts = <Action>[];
 
     if (actionList.isNotEmpty) {
       for (var e in actionList.first.children) {
         if (e is XmlElement) {
-          acts.add(new Action.fromXml(e));
+          acts.add(Action.fromXml(e));
         }
       }
     }
 
-    var vars = <StateVariable>[];
+    final vars = <StateVariable>[];
 
     if (varList.isNotEmpty) {
       for (var e in varList.first.children) {
         if (e is XmlElement) {
-          vars.add(new StateVariable.fromXml(e));
+          vars.add(StateVariable.fromXml(e));
         }
       }
     }
 
-    var service = new Service(
-        device, type, id, controlUrl, eventSubUrl, scpdUrl, acts, vars);
+    final service =
+        Service(device, type, id, controlUrl, eventSubUrl, scpdUrl, acts, vars);
 
     for (var act in acts) {
       act.service = service;
@@ -97,7 +97,7 @@ class ServiceDescription {
   }
 
   @override
-  String toString() => "ServiceDescription(${id})";
+  String toString() => 'ServiceDescription($id)';
 }
 
 class Service {
@@ -117,29 +117,29 @@ class Service {
   List<String?> get actionNames => actions.map((x) => x.name).toList();
 
   Future<String> sendToControlUrl(String? name, String param) async {
-    var body = _SOAP_BODY.replaceAll("{param}", param);
+    final body = _soapBody.replaceAll('{param}', param);
 
-    if (const bool.fromEnvironment("upnp.debug.control", defaultValue: false)) {
-      print("Send to ${controlUrl} (SOAPACTION: ${type}#${name}): ${body}");
+    if (const bool.fromEnvironment('upnp.debug.control', defaultValue: false)) {
+      print('Send to $controlUrl (SOAPACTION: $type#$name): $body');
     }
 
-    var request = await UpnpCommon.httpClient.postUrl(Uri.parse(controlUrl!));
-    request.headers.set("SOAPACTION", '"${type}#${name}"');
-    request.headers.set("Content-Type", 'text/xml; charset="utf-8"');
-    request.headers.set("User-Agent", 'CyberGarage-HTTP/1.0');
+    final request = await UpnpCommon.httpClient.postUrl(Uri.parse(controlUrl!));
+    request.headers.set('SOAPACTION', '"$type#$name"');
+    request.headers.set('Content-Type', 'text/xml; charset="utf-8"');
+    request.headers.set('User-Agent', 'CyberGarage-HTTP/1.0');
     request.write(body);
-    var response = await request.close();
+    final response = await request.close();
 
-    var content =
+    final content =
         await response.cast<List<int>>().transform(utf8.decoder).join();
 
     if (response.statusCode != 200) {
       try {
-        var doc = XmlDocument.parse(content);
-        throw new UpnpException(doc.rootElement);
+        final doc = XmlDocument.parse(content);
+        throw UpnpException(doc.rootElement);
       } catch (e) {
         if (e is! UpnpException) {
-          throw new Exception("\n\n${content}");
+          throw Exception('\n\n$content');
         } else {
           rethrow;
         }

@@ -1,15 +1,15 @@
-import "dart:async";
+import 'dart:async';
 
-import "package:upnp2/src/utils.dart";
-import "package:upnp2/upnp.dart";
+import 'package:upnp2/src/utils.dart';
+import 'package:upnp2/upnp.dart';
 
 main() async {
-  var discover = new DeviceDiscoverer();
+  final discover = DeviceDiscoverer();
   await discover.start(ipv6: false);
 
-  List<Device> devices = await discover.getDevices();
+  final List<Device> devices = await discover.getDevices();
 
-  var sub = new StateSubscriptionManager();
+  final sub = StateSubscriptionManager();
   await sub.init();
 
   for (Device device in devices) {
@@ -17,7 +17,8 @@ main() async {
       Service? service;
 
       try {
-        service = await desc.getService(device).timeout(const Duration(seconds: 5));
+        service =
+            await desc.getService(device).timeout(const Duration(seconds: 5));
       } catch (e) {
         print(e);
       }
@@ -25,9 +26,10 @@ main() async {
       if (service != null) {
         try {
           sub.subscribeToService(service).listen((value) {
-            print("${device.friendlyName} - ${service!.id}: ${value}");
+            print('${device.friendlyName} - ${service!.id}: $value');
           }, onError: (e, stack) {
-            print("Error while subscribing to ${service!.type} for ${device.friendlyName}: ${e}");
+            print(
+                'Error while subscribing to ${service!.type} for ${device.friendlyName}: $e');
           });
         } catch (e) {
           print(e);
@@ -36,8 +38,8 @@ main() async {
     }
   }
 
-  new Timer(const Duration(seconds: 60), () {
-    print("Ended.");
+  Timer(const Duration(seconds: 60), () {
+    print('Ended.');
     sub.close();
 
     Timer.run(() {

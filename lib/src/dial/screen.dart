@@ -2,26 +2,21 @@ part of upnp.dial;
 
 class DialScreen {
   static Stream<DialScreen> find({
-    bool silent: true
-  }) async* {
-    var discovery = new DeviceDiscoverer();
-    var ids = new Set<String?>();
+    bool silent = true}) async* {
+    final discovery = DeviceDiscoverer();
+    final ids = <String?>{};
 
     await for (DiscoveredClient client in discovery.quickDiscoverClients(
-      timeout: const Duration(seconds: 5),
-      query: CommonDevices.DIAL
-    )) {
+        timeout: const Duration(seconds: 5), query: CommonDevices.dial)) {
       if (ids.contains(client.usn)) {
         continue;
       }
       ids.add(client.usn);
 
       try {
-        var dev = await (client.getDevice() as FutureOr<Device>);
-        yield new DialScreen(
-          Uri.parse(Uri.parse(client.location!).origin),
-          dev.friendlyName
-        );
+        final dev = await (client.getDevice() as FutureOr<Device>);
+        yield DialScreen(
+            Uri.parse(Uri.parse(client.location!).origin), dev.friendlyName);
       } catch (e) {
         if (!silent) {
           rethrow;
@@ -36,14 +31,14 @@ class DialScreen {
   DialScreen(this.baseUri, this.name);
 
   factory DialScreen.forCastDevice(String ip, String deviceName) {
-    return new DialScreen(Uri.parse("http://${ip}:8008/"), deviceName);
+    return DialScreen(Uri.parse('http://$ip:8008/'), deviceName);
   }
 
   Future<bool> isIdle() async {
     HttpClientResponse? response;
 
     try {
-      response = await send("GET", "/apps");
+      response = await send('GET', '/apps');
       if (response.statusCode == 302) {
         return false;
       }
@@ -57,20 +52,21 @@ class DialScreen {
 
   Future launch(String app, {payload}) async {
     if (payload is Map) {
-      var out = "";
+      var out = '';
       for (String key in payload.keys as Iterable<String>) {
         if (out.isNotEmpty) {
-          out += "&";
+          out += '&';
         }
 
-        out += "${Uri.encodeComponent(key)}=${Uri.encodeComponent(payload[key].toString())}";
+        out +=
+            '${Uri.encodeComponent(key)}=${Uri.encodeComponent(payload[key].toString())}';
       }
       payload = out;
     }
 
     HttpClientResponse? response;
     try {
-      response = await send("POST", "/apps/${app}", body: payload);
+      response = await send('POST', '/apps/$app', body: payload);
       if (response.statusCode == 201) {
         return true;
       }
@@ -85,7 +81,7 @@ class DialScreen {
   Future<bool> hasApp(String app) async {
     HttpClientResponse? response;
     try {
-      response = await send("GET", "/apps/${app}");
+      response = await send('GET', '/apps/$app');
       if (response.statusCode == 404) {
         return false;
       }
@@ -100,10 +96,10 @@ class DialScreen {
   Future<String?> getCurrentApp() async {
     HttpClientResponse? response;
     try {
-      response = await send("GET", "/apps");
+      response = await send('GET', '/apps');
       if (response.statusCode == 302) {
-        var loc = response.headers.value("location")!;
-        var uri = Uri.parse(loc);
+        final loc = response.headers.value('location')!;
+        final uri = Uri.parse(loc);
         return uri.pathSegments[1];
       }
       return null;
@@ -115,11 +111,11 @@ class DialScreen {
   }
 
   Future<bool> close([String? app]) async {
-    var toClose = app == null ? await getCurrentApp() : app;
+    final toClose = app ?? await getCurrentApp();
     if (toClose != null) {
       HttpClientResponse? response;
       try {
-        response = await send("DELETE", "/apps/${toClose}");
+        response = await send('DELETE', '/apps/$toClose');
         if (response.statusCode != 200) {
           return false;
         }
@@ -139,9 +135,8 @@ class DialScreen {
       body,
       Map<String, dynamic>? headers
   }) async {
-    var request = await UpnpCommon.httpClient.openUrl(
-      method, baseUri.resolve(path)
-    );
+    final request =
+        await UpnpCommon.httpClient.openUrl(method, baseUri.resolve(path));
 
     if (body is String) {
       request.write(body);
@@ -151,7 +146,7 @@ class DialScreen {
 
     if (headers != null) {
       for (String key in headers.keys) {
-        request.headers.set(key, headers[key]);
+        request.headers.set(key, headers[key] as Object);
       }
     }
 

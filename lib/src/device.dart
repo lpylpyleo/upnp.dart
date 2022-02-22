@@ -26,44 +26,42 @@ class Device {
     url = u;
     deviceElement = e;
 
-    var uri = Uri.parse(url!);
+    final uri = Uri.parse(url!);
 
-    urlBase = XmlUtils.getTextSafe(deviceElement, "URLBase");
+    urlBase = XmlUtils.getTextSafe(deviceElement, 'URLBase');
 
-    if (urlBase == null) {
-      urlBase = uri.toString();
+    urlBase ??= uri.toString();
+
+    if (deviceElement.findElements('device').isEmpty) {
+      throw Exception('ERROR: Invalid Device XML!\n\n$deviceElement');
     }
 
-    if (deviceElement.findElements("device").isEmpty) {
-      throw new Exception("ERROR: Invalid Device XML!\n\n${deviceElement}");
-    }
+    final deviceNode = XmlUtils.getElementByName(deviceElement, 'device');
 
-    var deviceNode = XmlUtils.getElementByName(deviceElement, "device");
-
-    deviceType = XmlUtils.getTextSafe(deviceNode, "deviceType");
-    friendlyName = XmlUtils.getTextSafe(deviceNode, "friendlyName");
-    modelName = XmlUtils.getTextSafe(deviceNode, "modelName");
-    manufacturer = XmlUtils.getTextSafe(deviceNode, "manufacturer");
-    udn = XmlUtils.getTextSafe(deviceNode, "UDN");
-    presentationUrl = XmlUtils.getTextSafe(deviceNode, "presentationURL");
-    modelType = XmlUtils.getTextSafe(deviceNode, "modelType");
-    modelDescription = XmlUtils.getTextSafe(deviceNode, "modelDescription");
-    manufacturerUrl = XmlUtils.getTextSafe(deviceNode, "manufacturerURL");
+    deviceType = XmlUtils.getTextSafe(deviceNode, 'deviceType');
+    friendlyName = XmlUtils.getTextSafe(deviceNode, 'friendlyName');
+    modelName = XmlUtils.getTextSafe(deviceNode, 'modelName');
+    manufacturer = XmlUtils.getTextSafe(deviceNode, 'manufacturer');
+    udn = XmlUtils.getTextSafe(deviceNode, 'UDN');
+    presentationUrl = XmlUtils.getTextSafe(deviceNode, 'presentationURL');
+    modelType = XmlUtils.getTextSafe(deviceNode, 'modelType');
+    modelDescription = XmlUtils.getTextSafe(deviceNode, 'modelDescription');
+    manufacturerUrl = XmlUtils.getTextSafe(deviceNode, 'manufacturerURL');
 
     if (udn != null) {
-      uuid = udn!.substring("uuid:".length);
+      uuid = udn!.substring('uuid:'.length);
     }
 
-    if (deviceNode.findElements("iconList").isNotEmpty) {
-      var iconList = deviceNode.findElements("iconList").first;
+    if (deviceNode.findElements('iconList').isNotEmpty) {
+      final iconList = deviceNode.findElements('iconList').first;
       for (var child in iconList.children) {
         if (child is XmlElement) {
-          var icon = new Icon();
-          icon.mimetype = XmlUtils.getTextSafe(child, "mimetype");
-          var width = XmlUtils.getTextSafe(child, "width");
-          var height = XmlUtils.getTextSafe(child, "height");
-          var depth = XmlUtils.getTextSafe(child, "depth");
-          var url = XmlUtils.getTextSafe(child, "url");
+          final icon = Icon();
+          icon.mimetype = XmlUtils.getTextSafe(child, 'mimetype');
+          final width = XmlUtils.getTextSafe(child, 'width');
+          final height = XmlUtils.getTextSafe(child, 'height');
+          final depth = XmlUtils.getTextSafe(child, 'depth');
+          final url = XmlUtils.getTextSafe(child, 'url');
           if (width != null) {
             icon.width = int.parse(width);
           }
@@ -83,20 +81,20 @@ class Device {
       }
     }
 
-    Uri baseUri = Uri.parse(urlBase!);
+    final Uri baseUri = Uri.parse(urlBase!);
 
-    processDeviceNode(XmlElement e) {
-      if (e.findElements("serviceList").isNotEmpty) {
-        var list = e.findElements("serviceList").first;
+    void processDeviceNode(XmlElement e) {
+      if (e.findElements('serviceList').isNotEmpty) {
+        final list = e.findElements('serviceList').first;
         for (var svc in list.children) {
           if (svc is XmlElement) {
-            services.add(new ServiceDescription.fromXml(baseUri, svc));
+            services.add(ServiceDescription.fromXml(baseUri, svc));
           }
         }
       }
 
-      if (e.findElements("deviceList").isNotEmpty) {
-        var list = e.findElements("deviceList").first;
+      if (e.findElements('deviceList').isNotEmpty) {
+        final list = e.findElements('deviceList').first;
         for (var dvc in list.children) {
           if (dvc is XmlElement) {
             processDeviceNode(dvc);
@@ -129,11 +127,11 @@ class Icon {
 }
 
 class CommonDevices {
-  static const String DIAL = "urn:dial-multiscreen-org:service:dial:1";
-  static const String CHROMECAST = DIAL;
-  static const String WEMO = "urn:Belkin:device:controllee:1";
-  static const String WIFI_ROUTER =
-      "urn:schemas-wifialliance-org:device:WFADevice:1";
-  static const String WAN_ROUTER =
-      "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1";
+  static const String dial = 'urn:dial-multiscreen-org:service:dial:1';
+  static const String chromecast = dial;
+  static const String wemo = 'urn:Belkin:device:controllee:1';
+  static const String wifiRouter =
+      'urn:schemas-wifialliance-org:device:WFADevice:1';
+  static const String wanRouter =
+      'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1';
 }

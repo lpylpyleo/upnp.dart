@@ -10,15 +10,15 @@ class UpnpHostService {
   UpnpHostService({this.type, this.id, this.simpleName});
 
   XmlNode toXml() {
-    var x = new XmlBuilder();
-    x.element("scpd", nest: () {
-      x.namespace("urn:schemas-upnp-org:service-1-0");
-      x.element("specVersion", nest: () {
-        x.element("major", nest: "1");
-        x.element("minor", nest: "0");
+    final x = XmlBuilder();
+    x.element('scpd', nest: () {
+      x.namespace('urn:schemas-upnp-org:service-1-0');
+      x.element('specVersion', nest: () {
+        x.element('major', nest: '1');
+        x.element('minor', nest: '0');
       });
 
-      x.element("actionList", nest: () {
+      x.element('actionList', nest: () {
         for (var action in actions) {
           action.applyToXml(x);
         }

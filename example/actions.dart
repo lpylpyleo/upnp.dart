@@ -1,10 +1,10 @@
-import "package:upnp2/upnp.dart";
+import 'package:upnp2/upnp.dart';
 
 main(List<String> args) async {
-  var client = new DiscoveredClient.fake(args[0]);
-  var device = await client.getDevice();
+  final client = DiscoveredClient.fake(args[0]);
+  final device = await client.getDevice();
   print(device!.services);
-  var service = await device.getService(args[1]);
-  var result = await service!.invokeAction(args[2], {});
+  final service = await device.getService(args[1]);
+  final result = await service!.invokeAction(args[2], {});
   print(result);
 }

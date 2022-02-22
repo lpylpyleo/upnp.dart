@@ -1,6 +1,6 @@
 part of upnp.server;
 
-typedef HostActionHandler(Map<String, dynamic> params);
+typedef HostActionHandler = Function(Map<String, dynamic> params);
 
 class UpnpHostAction {
   final String name;
@@ -9,12 +9,12 @@ class UpnpHostAction {
   final HostActionHandler? handler;
 
   UpnpHostAction(this.name,
-      {this.inputs: const [], this.outputs: const [], this.handler});
+      {this.inputs = const [], this.outputs = const [], this.handler});
 
   void applyToXml(XmlBuilder x) {
-    x.element("action", nest: () {
-      x.element("name", nest: name);
-      x.element("argumentList", nest: () {
+    x.element('action', nest: () {
+      x.element('name', nest: name);
+      x.element('argumentList', nest: () {
         for (var input in inputs) {
           input.applyToXml(x);
         }
@@ -35,12 +35,12 @@ class UpnpHostActionArgument {
   UpnpHostActionArgument(this.name, this.isOutput, {this.relatedStateVariable});
 
   void applyToXml(XmlBuilder x) {
-    x.element("argument", nest: () {
-      x.element("name", nest: name);
-      x.element("direction", nest: isOutput ? "out" : "in");
+    x.element('argument', nest: () {
+      x.element('name', nest: name);
+      x.element('direction', nest: isOutput ? 'out' : 'in');
 
       if (relatedStateVariable != null) {
-        x.element("relatedStateVariable", nest: relatedStateVariable);
+        x.element('relatedStateVariable', nest: relatedStateVariable);
       }
     });
   }
