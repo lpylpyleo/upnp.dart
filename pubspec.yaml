@@ -2,6 +2,8 @@ name: upnp2
 version: 3.0.1
 description: Universal Plugin and Play Host/Client
 homepage: https://github.com/Butzlabben/upnp.dart
+repository: https://github.com/Butzlabben/upnp.dart
+
 dependencies:
   xml: "^5.1.0"
   crypto: "^3.0.1"
