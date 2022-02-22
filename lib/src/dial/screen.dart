@@ -1,8 +1,13 @@
 part of upnp.dial;
 
+/// This class represents a screen (tv) with DIAL (DIscovery and LAunch) capabilities.
+/// Use it to find such screens and launch/manage apps on it.
+/// See [here](http://www.dial-multiscreen.org/dial-registry/namespace-database) for a list of apps
 class DialScreen {
-  static Stream<DialScreen> find({
-    bool silent = true}) async* {
+  /// Returns a stream of discovered devices with DIAL capabilities.
+  /// Already found devices won't be added again to the stream.
+  /// If silent, no exceptions will be passed to the returned stream.
+  static Stream<DialScreen> find({bool silent = true}) async* {
     final discovery = DeviceDiscoverer();
     final ids = <String?>{};
 
@@ -25,15 +30,20 @@ class DialScreen {
     }
   }
 
+  /// The base part of the uri which is utilized to make requests
   final Uri baseUri;
+
+  /// The optional name of this screen
   final String? name;
 
   DialScreen(this.baseUri, this.name);
 
+  /// Uses [new DialScreen] and makes your ip to an uri with http and port 8008
   factory DialScreen.forCastDevice(String ip, String deviceName) {
     return DialScreen(Uri.parse('http://$ip:8008/'), deviceName);
   }
 
+  /// Returns if this screen is idling, which means that no app is opened
   Future<bool> isIdle() async {
     HttpClientResponse? response;
 
@@ -50,6 +60,7 @@ class DialScreen {
     }
   }
 
+  /// Launches the specified app with an optional paylod
   Future launch(String app, {payload}) async {
     if (payload is Map) {
       var out = '';
@@ -78,6 +89,7 @@ class DialScreen {
     }
   }
 
+  /// Returns if this screen has the specified app installed
   Future<bool> hasApp(String app) async {
     HttpClientResponse? response;
     try {
@@ -93,6 +105,7 @@ class DialScreen {
     }
   }
 
+  /// Returns the name of the specified or otherwise null
   Future<String?> getCurrentApp() async {
     HttpClientResponse? response;
     try {
@@ -110,6 +123,7 @@ class DialScreen {
     }
   }
 
+  /// Closes either the specified app or if none given the current app
   Future<bool> close([String? app]) async {
     final toClose = app ?? await getCurrentApp();
     if (toClose != null) {
@@ -129,12 +143,10 @@ class DialScreen {
     return false;
   }
 
-  Future<HttpClientResponse> send(
-    String method,
-    String path, {
-      body,
-      Map<String, dynamic>? headers
-  }) async {
+  /// Use this method to send custom HTTP requests to the screen
+  /// See [UpnpCommon.httpClient.openUrl]
+  Future<HttpClientResponse> send(String method, String path,
+      {body, Map<String, dynamic>? headers}) async {
     final request =
         await UpnpCommon.httpClient.openUrl(method, baseUri.resolve(path));
 

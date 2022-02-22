@@ -9,13 +9,24 @@ const String _soapBody = '''
 </s:Envelope>
 ''';
 
+/// A description for an upnp service
 class ServiceDescription {
+  /// The urn of this services type
   String? type;
+
+  /// The urn of this services id
   String? id;
+
+  /// The url to control this service
   String? controlUrl;
+
+  /// The url to subscribe to events
   String? eventSubUrl;
+
+  /// The url this services description
   String? scpdUrl;
 
+  /// Initializes this description from the provided xml element
   ServiceDescription.fromXml(Uri uriBase, XmlElement service) {
     type = XmlUtils.getTextSafe(service, 'serviceType')!.trim();
     id = XmlUtils.getTextSafe(service, 'serviceId')!.trim();
@@ -33,6 +44,8 @@ class ServiceDescription {
     }
   }
 
+  /// Returns the according service from this description.
+  /// The provided device gets used to initialize it in the service
   Future<Service?> getService([Device? device]) async {
     if (scpdUrl == null) {
       throw Exception('Unable to fetch service, no SCPD URL.');
@@ -100,22 +113,41 @@ class ServiceDescription {
   String toString() => 'ServiceDescription($id)';
 }
 
+/// A upnp service
 class Service {
+  /// The device this service is running on
   final Device? device;
+
+  /// The type of this service
   final String? type;
+
+  /// The id of this service
   final String? id;
+
+  /// The actions which can be invoked
   final List<Action> actions;
+
+  /// The state variables of this service
   final List<StateVariable> stateVariables;
 
+  /// The url to invoke this service
   String? controlUrl;
+
+  /// The url to subscribe to events
   String? eventSubUrl;
+
+  /// The url to the service description
   String? scpdUrl;
 
   Service(this.device, this.type, this.id, this.controlUrl, this.eventSubUrl,
       this.scpdUrl, this.actions, this.stateVariables);
 
+  /// Returns a list of the names of the actions
+  /// See [Action.name]
   List<String?> get actionNames => actions.map((x) => x.name).toList();
 
+  /// Sends a request to the control url with the name of the action
+  /// and the param. Used by [Action.invoke(args)]
   Future<String> sendToControlUrl(String? name, String param) async {
     final body = _soapBody.replaceAll('{param}', param);
 
@@ -149,6 +181,7 @@ class Service {
     }
   }
 
+  /// Invoke an action with the specified name and args
   Future<Map<String, String>> invokeAction(
       String name, Map<String, dynamic> args) async {
     return await actions.firstWhere((it) => it.name == name).invoke(args);

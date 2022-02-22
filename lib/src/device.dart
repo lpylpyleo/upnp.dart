@@ -1,30 +1,63 @@
 part of upnp;
 
+/// A upnp device
 class Device {
+  /// The xml element the properties of this object were initialized from
   late XmlElement deviceElement;
 
+  /// The urn of this type of device
   String? deviceType;
+
+  /// The base url of this device
   String? urlBase;
+
+  /// The user friendly name
   String? friendlyName;
+
+  /// The manufacturer of this device
   String? manufacturer;
+
+  /// The name of this model
   String? modelName;
+
+  /// The universal device name of this device
   String? udn;
+
+  /// The uuid extracted from the [udn]
   String? uuid;
+
+  /// The url provided in [loadFromXml]
   String? url;
+
+  /// The url for presentation
   String? presentationUrl;
+
+  /// The type of model of this device
   String? modelType;
+
+  /// The long user-friendly title
   String? modelDescription;
+
+  /// The model numbe rof this device
   String? modelNumber;
+
+  /// The URL to the manufacturer site
   String? manufacturerUrl;
 
+  /// The list of icons
   List<Icon> icons = [];
+
+  /// The list of provided services
   List<ServiceDescription> services = [];
 
+  /// Returns all IDs/service names of the services of this device.
+  /// See [ServiceDescription.id]
   List<String?> get serviceNames => services.map((x) => x.id).toList();
 
-  void loadFromXml(String? u, XmlElement e) {
-    url = u;
-    deviceElement = e;
+  /// Initializes all fields from the xml element
+  void loadFromXml(String? url, XmlElement element) {
+    this.url = url;
+    deviceElement = element;
 
     final uri = Uri.parse(url!);
 
@@ -106,6 +139,7 @@ class Device {
     processDeviceNode(deviceNode);
   }
 
+  /// Returns the service of the specified type or null if this device does not support this service
   Future<Service?> getService(String type) async {
     try {
       final service = services.firstWhere(
@@ -118,20 +152,40 @@ class Device {
   }
 }
 
+/// An icon of an upnp device
 class Icon {
+  /// The mimetype of this icon, always "image/<format>" like "image/png"
   String? mimetype;
+
+  /// The amount of horizontal pixels
   int? width;
+
+  /// The amount of vertical pixels
   int? height;
+
+  /// The color depth of this image
   int? depth;
+
+  /// The url to this icon
   String? url;
 }
 
+/// This class holds some constants for URNs for common devices
 class CommonDevices {
+  /// The urn for DIAL devices
   static const String dial = 'urn:dial-multiscreen-org:service:dial:1';
+
+  /// The urn for chromecasts, which is currently [dial]
   static const String chromecast = dial;
+
+  /// The urn for WEMO devices
   static const String wemo = 'urn:Belkin:device:controllee:1';
+
+  /// The urn for wifi router devices
   static const String wifiRouter =
       'urn:schemas-wifialliance-org:device:WFADevice:1';
+
+  /// The urn for wan router devices
   static const String wanRouter =
       'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1';
 }

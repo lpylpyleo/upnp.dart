@@ -1,6 +1,10 @@
 part of upnp;
 
+// TODO maybe move to utils.dart?
+/// A helper class for WEMO devices.
+/// Apparently WEMO devices use a lot of escaped angle brackets in their attributes
 class WemoHelper {
+  /// Parses attributes from the input xml string
   static Map<String, dynamic> parseAttributes(String input) {
     final doc = XmlDocument.parse(
             '<attributes>' + XmlUtils.unescape(input) + '</attributes>')
@@ -18,6 +22,7 @@ class WemoHelper {
     return attr as Map<String, dynamic>;
   }
 
+  /// Encodes attributes from a map to an XML String
   static String encodeAttributes(Map<String, dynamic> attr) {
     final buff = StringBuffer();
     for (var key in attr.keys) {

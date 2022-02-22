@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.4
+
+- add a lot of documentation
+
 ## 3.0.3
 
 - fix a lot of linter issues
