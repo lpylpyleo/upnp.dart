@@ -42,8 +42,7 @@ class UpnpDiscoveryServer {
       } on SocketException {
         try {
           withAddress(_v6Multicast);
-        } catch(_) {
-        }
+        } catch (_) {}
       }
     }
 
@@ -79,15 +78,15 @@ class UpnpDiscoveryServer {
               }
             }
           }
-        } catch (_) {
-        }
+        } catch (_) {}
       }
     });
 
     await notify();
   }
 
-  Future<List<String>> respondToSearch(String? target, Datagram pkt, Map<String, String> headers) async {
+  Future<List<String>> respondToSearch(
+      String? target, Datagram pkt, Map<String, String> headers) async {
     final out = <String>[];
 
     void addDevice(String? profile) {

@@ -227,8 +227,8 @@ class StateSubscription {
     HttpClientResponse response;
     try {
       response = await request.close().timeout(
-        const Duration(seconds: 10),
-      );
+            const Duration(seconds: 10),
+          );
     } on TimeoutException {
       return;
     }

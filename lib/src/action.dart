@@ -54,10 +54,15 @@ class Action {
 
   Future<Map<String, String>> invoke(Map<String, dynamic> args) async {
     final param = '  <u:$name xmlns:u="${service.type}">' +
-        args.keys.map((it) {
-          String argsIt = args[it].toString();
-          argsIt = argsIt.replaceAll('&', '&amp;');
-          return '<$it>$argsIt</$it>';
+        args.keys.map((argumentName) {
+          String argument = args[argumentName].toString();
+          argument = argument.replaceAll('&', '&amp;');
+          argument = argument.replaceAll('<', '&lt;');
+          argument = argument.replaceAll('>', '&gt;');
+          argument = argument.replaceAll('\'', '&apos;');
+          argument = argument.replaceAll('"', '&qout;');
+
+          return '<$argumentName>$argument</$argumentName>';
         }).join('\n') +
         '</u:$name>\n';
 

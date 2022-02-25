@@ -19,7 +19,7 @@ class UpnpServer {
     } else if (path.startsWith('/upnp/control/') && request.method == 'POST') {
       await handleControlRequest(request);
     } else {
-      request.response..statusCode = HttpStatus.notFound;
+      request.response.statusCode = HttpStatus.notFound;
       await request.response.close();
     }
   }
@@ -43,7 +43,7 @@ class UpnpServer {
     service ??= device.findService(Uri.decodeComponent(name));
 
     if (service == null) {
-      request.response..statusCode = HttpStatus.notFound;
+      request.response.statusCode = HttpStatus.notFound;
       await request.response.close();
     } else {
       final xml = service.toXml();
@@ -66,7 +66,7 @@ class UpnpServer {
         device.findService(Uri.decodeComponent(request.uri.pathSegments.last));
 
     if (service == null) {
-      request.response..statusCode = HttpStatus.notFound;
+      request.response.statusCode = HttpStatus.notFound;
       await request.response.close();
       return;
     }
@@ -78,7 +78,7 @@ class UpnpServer {
         try {
           act = service.actions.firstWhere((x) => x.name == name);
         } catch (e) {
-          request.response..statusCode = HttpStatus.badRequest;
+          request.response.statusCode = HttpStatus.badRequest;
           await request.response.close();
           return;
         }
@@ -86,7 +86,7 @@ class UpnpServer {
         if (act.handler != null) {
           // TODO(kaendfinger): make this have inputs and outputs.
           await act.handler!({});
-          request.response..statusCode = HttpStatus.ok;
+          request.response.statusCode = HttpStatus.ok;
           await request.response.close();
           return;
         }

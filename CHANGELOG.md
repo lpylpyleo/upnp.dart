@@ -1,6 +1,13 @@
 # Changelog
 
+## 3.0.6
+
+- format all files
+- fix argument replacement to be according to UPnP/XML
+- fix some more linter issues (using `lints` dart package now)
+
 ## 3.0.5
+
 - fix code of null safety migration (we need to make some tests)
 - fix use of constant in coffe_make.dart
 

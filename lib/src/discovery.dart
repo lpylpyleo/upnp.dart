@@ -91,7 +91,8 @@ class DeviceDiscoverer {
           }
 
           break;
-        case RawSocketEvent.write:
+        default:
+          // We do not care about any other packages
           break;
       }
     });
