@@ -163,6 +163,8 @@ class Service {
     request.headers.set('SOAPACTION', '"$type#$name"');
     request.headers.set('Content-Type', 'text/xml; charset="utf-8"');
     request.headers.set('User-Agent', 'CyberGarage-HTTP/1.0');
+    // We use UTF-8 in the body so we use it here to calculate the length
+    request.headers.set('Content-Length', utf8.encode(body).length);
     request.write(body);
     final response = await request.close();
 
