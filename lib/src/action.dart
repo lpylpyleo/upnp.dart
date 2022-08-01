@@ -53,8 +53,7 @@ class Action {
   }
 
   Future<Map<String, String>> invoke(Map<String, dynamic> args) async {
-    final param = '  <u:$name xmlns:u="${service.type}">' +
-        args.keys.map((argumentName) {
+    final param = '  <u:$name xmlns:u="${service.type}">${args.keys.map((argumentName) {
           String argument = args[argumentName].toString();
           argument = argument.replaceAll('&', '&amp;');
           argument = argument.replaceAll('<', '&lt;');
@@ -63,8 +62,7 @@ class Action {
           argument = argument.replaceAll('"', '&qout;');
 
           return '<$argumentName>$argument</$argumentName>';
-        }).join('\n') +
-        '</u:$name>\n';
+        }).join('\n')}</u:$name>\n';
 
     final result = await service.sendToControlUrl(name, param);
     final doc = XmlDocument.parse(result);

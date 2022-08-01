@@ -7,7 +7,7 @@ class WemoHelper {
   /// Parses attributes from the input xml string
   static Map<String, dynamic> parseAttributes(String input) {
     final doc = XmlDocument.parse(
-            '<attributes>' + XmlUtils.unescape(input) + '</attributes>')
+            '<attributes>${XmlUtils.unescape(input)}</attributes>')
         .rootElement;
     final attr = {};
     doc.children.whereType<XmlElement>().forEach((element) {

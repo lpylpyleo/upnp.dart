@@ -80,7 +80,7 @@ class InternalNetworkUtils {
     final interfaces = await NetworkInterface.list();
 
     String? calc(int skip) {
-      final prefix = parts.take(parts.length - skip).join('.') + '.';
+      final prefix = '${parts.take(parts.length - skip).join('.')}.';
 
       for (NetworkInterface interface in interfaces) {
         for (InternetAddress addr in interface.addresses) {

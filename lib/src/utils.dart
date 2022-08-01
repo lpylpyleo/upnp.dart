@@ -2,7 +2,7 @@ library upnp.utils;
 
 import 'dart:io';
 
-import 'package:xml/xml.dart' hide parse;
+import 'package:xml/xml.dart';
 
 /// An exception thrown during an upnp action
 class UpnpException implements Exception {
@@ -13,7 +13,7 @@ class UpnpException implements Exception {
   UpnpException(this.element);
 
   @override
-  String toString() => 'UpnpException: ' + element.toXmlString();
+  String toString() => 'UpnpException: ${element.toXmlString()}';
 }
 
 // TODO maybe replace some methods with extensions?
