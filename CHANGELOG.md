@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.7
+
+- update dependencies
+- make example visible for pub.dev
+
 ## 3.0.6
 
 - format all files
