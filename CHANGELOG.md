@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0.8
+- do not use `reusePort` option on Windows, see [#4](https://github.com/Butzlabben/upnp.dart/issues/4)
+
 ## 3.0.7
 
 - update dependencies

@@ -40,7 +40,8 @@ class DeviceDiscoverer {
       address,
       port,
       reuseAddress: true,
-      reusePort: true,
+      // Windows does not support reusePort
+      reusePort: !Platform.isWindows,
     );
 
     socket.broadcastEnabled = true;
