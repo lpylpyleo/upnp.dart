@@ -1,6 +1,11 @@
 # Changelog
 
+## 3.0.9
+
+- fix formatting
+
 ## 3.0.8
+
 - do not use `reusePort` option on Windows, see [#4](https://github.com/Butzlabben/upnp.dart/issues/4)
 
 ## 3.0.7
@@ -17,7 +22,7 @@
 ## 3.0.5
 
 - fix code of null safety migration (we need to make some tests)
-- fix use of constant in coffe_make.dart
+- fix use of constant in coffee_make.dart
 
 ## 3.0.4
 

@@ -1,5 +1,5 @@
 name: upnp2
-version: 3.0.8
+version: 3.0.9
 description: Universal Plugin and Play Host/Client. This package can be used to discover upnp devices, invoke actions as well as spin up an upnp server.
 homepage: https://github.com/Butzlabben/upnp.dart
 repository: https://github.com/Butzlabben/upnp.dart
