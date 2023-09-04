@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0.11
+- update dependencies
+
 ## 3.0.10
 
 - do not use `reusePort` option on Android, see [#5](https://github.com/Butzlabben/upnp.dart/issues/5)

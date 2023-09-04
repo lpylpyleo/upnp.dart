@@ -103,7 +103,7 @@ class Action {
         response.children.whereType<XmlElement>().toList();
     final map = <String, String>{};
     for (XmlElement r in results) {
-      map[r.name.local] = r.text;
+      map[r.name.local] = r.innerText;
     }
     return map;
   }

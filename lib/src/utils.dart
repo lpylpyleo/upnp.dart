@@ -30,7 +30,7 @@ class XmlUtils {
     if (elements.isEmpty) {
       return null;
     }
-    return elements.first.text;
+    return elements.first.innerText;
   }
 
   /// Replaces escaped angle brackets (<>) to their real chars

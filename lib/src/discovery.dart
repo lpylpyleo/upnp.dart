@@ -352,7 +352,7 @@ class DiscoveredClient {
     try {
       uri = Uri.parse(location!);
     } catch (e) {
-      return Future.sync(() => null);
+      return null;
     }
 
     final request = await UpnpCommon.httpClient
