@@ -30,18 +30,25 @@ class ServiceDescription {
   ServiceDescription.fromXml(Uri uriBase, XmlElement service) {
     type = XmlUtils.getTextSafe(service, 'serviceType')!.trim();
     id = XmlUtils.getTextSafe(service, 'serviceId')!.trim();
-    controlUrl = uriBase
-        .replace(path: XmlUtils.getTextSafe(service, 'controlURL')!.trim())
-        .toString();
-    eventSubUrl = uriBase
-        .replace(path: XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
-        .toString();
+    controlUrl =
+        patchUrl(uriBase, XmlUtils.getTextSafe(service, 'controlURL')!.trim())
+            .toString();
+    eventSubUrl =
+        patchUrl(uriBase, XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
+            .toString();
 
     final m = XmlUtils.getTextSafe(service, 'SCPDURL');
 
     if (m != null) {
       scpdUrl = uriBase.resolve(m).toString();
     }
+  }
+
+  static Uri patchUrl(Uri uri, String path) {
+    if (!path.startsWith('/')) {
+      return uri.replace(path: path);
+    }
+    return uri.resolve(path);
   }
 
   /// Returns the according service from this description.
