@@ -31,10 +31,10 @@ class ServiceDescription {
     type = XmlUtils.getTextSafe(service, 'serviceType')!.trim();
     id = XmlUtils.getTextSafe(service, 'serviceId')!.trim();
     controlUrl = uriBase
-        .resolve(XmlUtils.getTextSafe(service, 'controlURL')!.trim())
+        .replace(path: XmlUtils.getTextSafe(service, 'controlURL')!.trim())
         .toString();
     eventSubUrl = uriBase
-        .resolve(XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
+        .replace(path: XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
         .toString();
 
     final m = XmlUtils.getTextSafe(service, 'SCPDURL');
