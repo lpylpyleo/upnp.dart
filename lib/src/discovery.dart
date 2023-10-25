@@ -101,7 +101,18 @@ class DeviceDiscoverer {
     for (var interface in _interfaces) {
       if (address.type == InternetAddressType.IPv4) {
         try {
-          socket.joinMulticast(_v4Multicast, interface);
+          // According to Binding to multicast socket fails in iOS >= 11.0
+          // https://github.com/dart-lang/sdk/issues/42250
+          // Fix here:
+          if ((Platform.isMacOS || Platform.isIOS)) {
+            final value = Uint8List.fromList(
+                _v4Multicast.rawAddress + interface.addresses[0].rawAddress);
+            socket.setRawOption(
+              RawSocketOption(RawSocketOption.levelIPv4, 12, value),
+            );
+          } else {
+            socket.joinMulticast(_v4Multicast, interface);
+          }
         } on Exception catch (e) {
           onError(Exception('proto: IPv4, IF: ${interface.name}, $e'));
         }
