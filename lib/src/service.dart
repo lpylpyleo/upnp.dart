@@ -44,8 +44,11 @@ class ServiceDescription {
     }
   }
 
+  /// [Uri.resolve] will check legality and throw `FormatException`
+  /// These `controlURL` and `eventSubURL` are start with `_`.
+  /// [patchUrl] fixed as with these, see more in `test/parse_test.dart`.
   static Uri patchUrl(Uri uri, String path) {
-    if (!path.startsWith('/')) {
+    if (path.startsWith('_')) {
       return uri.replace(path: path);
     }
     return uri.resolve(path);
