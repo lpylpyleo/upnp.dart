@@ -4,6 +4,10 @@ import 'package:xml/xml.dart';
 
 void main() {
   test('url patch', () {
+    final o = Uri.parse('http://a.com/path');
+    expect(o.resolve('a:b'), Uri.parse('a:b'));
+    expect(() => o.resolve('_a:b'), throwsA(isA<FormatException>()));
+
     final uri = Uri.parse('http://a.com/path');
     final n1 = ServiceDescription.patchUrl(uri, '/foo?a');
     expect(n1.path, '/foo');
@@ -19,6 +23,8 @@ void main() {
         Uri.parse('http://a.com/foo'));
     expect(ServiceDescription.patchUrl(uri, '/foo?a'),
         Uri.parse('http://a.com/foo?a'));
+    expect(ServiceDescription.patchUrl(uri, '_foo:a'),
+        Uri.parse('http://a.com/_foo:a'));
   });
 
   test('service parse', () {
