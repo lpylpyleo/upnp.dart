@@ -30,18 +30,28 @@ class ServiceDescription {
   ServiceDescription.fromXml(Uri uriBase, XmlElement service) {
     type = XmlUtils.getTextSafe(service, 'serviceType')!.trim();
     id = XmlUtils.getTextSafe(service, 'serviceId')!.trim();
-    controlUrl = uriBase
-        .resolve(XmlUtils.getTextSafe(service, 'controlURL')!.trim())
-        .toString();
-    eventSubUrl = uriBase
-        .resolve(XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
-        .toString();
+    controlUrl =
+        patchUrl(uriBase, XmlUtils.getTextSafe(service, 'controlURL')!.trim())
+            .toString();
+    eventSubUrl =
+        patchUrl(uriBase, XmlUtils.getTextSafe(service, 'eventSubURL')!.trim())
+            .toString();
 
     final m = XmlUtils.getTextSafe(service, 'SCPDURL');
 
     if (m != null) {
       scpdUrl = uriBase.resolve(m).toString();
     }
+  }
+
+  /// [Uri.resolve] will check legality and throw `FormatException`
+  /// These `controlURL` and `eventSubURL` are start with `_`.
+  /// [patchUrl] fixed as with these, see more in `test/parse_test.dart`.
+  static Uri patchUrl(Uri uri, String path) {
+    if (path.startsWith('_')) {
+      return uri.replace(path: path);
+    }
+    return uri.resolve(path);
   }
 
   /// Returns the according service from this description.
