@@ -1,4 +1,4 @@
-part of upnp;
+part of '../upnp.dart';
 
 // TODO maybe move to utils.dart?
 /// A helper class for WEMO devices.

@@ -1,4 +1,4 @@
-part of upnp.router;
+part of '../../router.dart';
 
 /// Represents an upnp enabled router
 class Router {

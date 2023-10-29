@@ -1,4 +1,4 @@
-part of upnp.server;
+part of '../../server.dart';
 
 class UpnpHostUtils {
   static Future<String> getCurrentIp() async {

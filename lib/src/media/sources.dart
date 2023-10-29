@@ -1,1 +1,1 @@
-part of upnp.media;
+part of '../../media.dart';

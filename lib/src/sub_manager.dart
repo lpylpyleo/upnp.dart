@@ -1,4 +1,4 @@
-part of upnp;
+part of '../upnp.dart';
 
 class StateSubscriptionManager {
   HttpServer? server;

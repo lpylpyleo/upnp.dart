@@ -1,4 +1,4 @@
-part of upnp.server;
+part of '../../server.dart';
 
 typedef HostActionHandler = Function(Map<String, dynamic> params);
 

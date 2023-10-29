@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.12
+- fix not being able to parse some XML schemes, thanks to [pedia](https://github.com/pedia), see [#12](https://github.com/daniel-naegele/upnp.dart/pull/12)
+- fixed failed binding for multicast socket in iOS 11.0 or higher, thanks to [pedia](https://github.com/pedia), see [#13](https://github.com/daniel-naegele/upnp.dart/pull/13)
+- fixed typo in html escaping, thanks to [deckerst](https://github.com/deckerst), see [#14](https://github.com/daniel-naegele/upnp.dart/pull/14)
+
 ## 3.0.11
 - update dependencies
 

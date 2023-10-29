@@ -1,4 +1,4 @@
-part of upnp.dial;
+part of '../../dial.dart';
 
 /// This class represents a screen (tv) with DIAL (DIscovery and LAunch) capabilities.
 /// Use it to find such screens and launch/manage apps on it.

@@ -1,4 +1,4 @@
-part of upnp.server;
+part of '../../server.dart';
 
 final InternetAddress _v4Multicast = InternetAddress('239.255.255.250');
 final InternetAddress _v6Multicast = InternetAddress('FF05::C');

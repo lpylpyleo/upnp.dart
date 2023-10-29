@@ -1,4 +1,4 @@
-part of upnp.server;
+part of '../../server.dart';
 
 class UpnpHostService {
   final String? type;

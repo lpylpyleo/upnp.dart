@@ -1,4 +1,4 @@
-part of upnp;
+part of '../upnp.dart';
 
 const String _soapBody = '''
 <?xml version="1.0" encoding="utf-8"?>
