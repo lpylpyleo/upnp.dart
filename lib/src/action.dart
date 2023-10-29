@@ -60,7 +60,7 @@ class Action {
       argument = argument.replaceAll('<', '&lt;');
       argument = argument.replaceAll('>', '&gt;');
       argument = argument.replaceAll('\'', '&apos;');
-      argument = argument.replaceAll('"', '&qout;');
+      argument = argument.replaceAll('"', '&quot;');
 
       return '<$argumentName>$argument</$argumentName>';
     }).join('\n')}</u:$name>\n';
