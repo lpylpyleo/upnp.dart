@@ -1,6 +1,6 @@
 part of '../../server.dart';
 
-typedef HostActionHandler = Function(Map<String, dynamic> params);
+typedef HostActionHandler = Future<Map<String, String>> Function(Map<String, String> inputs);
 
 class UpnpHostAction {
   final String name;
@@ -8,8 +8,7 @@ class UpnpHostAction {
   final List<UpnpHostActionArgument> outputs;
   final HostActionHandler? handler;
 
-  UpnpHostAction(this.name,
-      {this.inputs = const [], this.outputs = const [], this.handler});
+  UpnpHostAction(this.name, {this.inputs = const [], this.outputs = const [], this.handler});
 
   void applyToXml(XmlBuilder x) {
     x.element('action', nest: () {

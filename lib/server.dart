@@ -18,3 +18,11 @@ part 'src/server/server.dart';
 part 'src/server/service.dart';
 
 part 'src/server/utils.dart';
+
+part 'src/server/dlna_server.dart';
+
+part 'src/server/dlna_service.dart';
+
+part 'src/server/dlna_protocol.dart';
+
+part 'src/server/dlna_models.dart';

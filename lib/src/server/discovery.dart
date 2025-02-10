@@ -25,24 +25,17 @@ class UpnpDiscoveryServer {
     _socket = await RawDatagramSocket.bind('0.0.0.0', 1900);
 
     _interfaces = await NetworkInterface.list();
-    final void Function(InternetAddress, [NetworkInterface])
-        joinMulticastFunction = _socket!.joinMulticast;
     for (var interface in _interfaces) {
-      void withAddress(InternetAddress address) {
-        try {
-          Function.apply(
-              joinMulticastFunction, [address], {#interface: interface});
-        } on NoSuchMethodError {
-          Function.apply(joinMulticastFunction, [address, interface]);
-        }
-      }
-
       try {
-        withAddress(_v4Multicast);
-      } on SocketException {
+        _socket!.joinMulticast(_v4Multicast, interface);
+      } on SocketException catch (e, stack) {
+        print('SocketException with IPv4 multicast: $e\n$stack');
         try {
-          withAddress(_v6Multicast);
-        } catch (_) {}
+          _socket!.joinMulticast(_v6Multicast, interface);
+        } catch (e, stack) {
+          print('Error with IPv6 multicast: $e\n$stack');
+          rethrow;
+        }
       }
     }
 
@@ -59,14 +52,14 @@ class UpnpDiscoveryServer {
           final lines = string.split('\r\n');
           final firstLine = lines.first;
 
-          if (firstLine.trim() == 'M-SEARCH * HTTP/1.1') {
+          if (RegExp(r'^M-SEARCH \* HTTP/1\.[01]$', caseSensitive: false).hasMatch(firstLine.trim())) {
             final map = <String, String>{};
             for (String line in lines.skip(1)) {
               if (line.trim().isEmpty) continue;
               if (!line.contains(':')) continue;
               final parts = line.split(':');
-              final key = parts.first;
-              final value = parts.skip(1).join(':');
+              final key = parts.first.trim();
+              final value = parts.skip(1).join(':').trim();
               map[key.toUpperCase()] = value;
             }
 
@@ -78,15 +71,17 @@ class UpnpDiscoveryServer {
               }
             }
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          print('Error processing SSDP packet: $e\n$stack');
+          rethrow;
+        }
       }
     });
 
     await notify();
   }
 
-  Future<List<String>> respondToSearch(
-      String? target, Datagram pkt, Map<String, String> headers) async {
+  Future<List<String>> respondToSearch(String? target, Datagram pkt, Map<String, String> headers) async {
     final out = <String>[];
 
     void addDevice(String? profile) {
@@ -127,7 +122,7 @@ class UpnpDiscoveryServer {
       final buff = StringBuffer();
       buff.write('NOTIFY * HTTP/1.1\r\n');
       buff.write('HOST: 239.255.255.250:1900\r\n');
-      buff.write('CACHE-CONTROL: max-age=10');
+      buff.write('CACHE-CONTROL: max-age=10\r\n');
       buff.write('LOCATION: $rootDescriptionUrl\r\n');
       buff.write('NT: ${device.deviceType}\r\n');
       buff.write('NTS: ssdp:alive\r\n');

@@ -18,8 +18,7 @@ class Action {
       }
 
       final direction = XmlUtils.getTextSafe(argdef, 'direction');
-      final relatedStateVariable =
-          XmlUtils.getTextSafe(argdef, 'relatedStateVariable');
+      final relatedStateVariable = XmlUtils.getTextSafe(argdef, 'relatedStateVariable');
       var isRetVal = direction == 'out';
 
       if (this.name!.startsWith('Get')) {
@@ -33,15 +32,13 @@ class Action {
         name = name.substring(3);
       }
 
-      arguments.add(ActionArgument(
-          this, name, direction, relatedStateVariable, isRetVal));
+      arguments.add(ActionArgument(this, name, direction, relatedStateVariable, isRetVal));
     }
 
     final argumentLists = e.findElements('argumentList');
     if (argumentLists.isNotEmpty) {
       final argList = argumentLists.first;
-      if (argList.children
-          .any((x) => x is XmlElement && x.name.local == 'name')) {
+      if (argList.children.any((x) => x is XmlElement && x.name.local == 'name')) {
         // Bad UPnP Implementation fix for WeMo
         addArgDef(argList, true);
       } else {
@@ -53,8 +50,7 @@ class Action {
   }
 
   Future<Map<String, String>> invoke(Map<String, dynamic> args) async {
-    final param =
-        '  <u:$name xmlns:u="${service.type}">${args.keys.map((argumentName) {
+    final param = '  <u:$name xmlns:u="${service.type}">${args.keys.map((argumentName) {
       String argument = args[argumentName].toString();
       argument = argument.replaceAll('&', '&amp;');
       argument = argument.replaceAll('<', '&lt;');
@@ -70,17 +66,14 @@ class Action {
     XmlElement response = doc.rootElement;
 
     if (response.name.local != 'Body') {
-      response =
-          response.children.firstWhere((x) => x is XmlElement) as XmlElement;
+      response = response.children.firstWhere((x) => x is XmlElement) as XmlElement;
     }
 
-    if (const bool.fromEnvironment('upnp.action.show_response',
-        defaultValue: false)) {
+    if (const bool.fromEnvironment('upnp.action.show_response', defaultValue: false)) {
       print('Got Action Response: ${response.toXmlString()}');
     }
 
-    if (!response.name.local.contains('Response') &&
-        response.children.length > 1) {
+    if (!response.name.local.contains('Response') && response.children.length > 1) {
       response = response.children[1] as XmlElement;
     }
 
@@ -94,13 +87,11 @@ class Action {
       }
     }
 
-    if (const bool.fromEnvironment('upnp.action.show_response',
-        defaultValue: false)) {
+    if (const bool.fromEnvironment('upnp.action.show_response', defaultValue: false)) {
       print('Got Action Response (Real): ${response.toXmlString()}');
     }
 
-    final List<XmlElement> results =
-        response.children.whereType<XmlElement>().toList();
+    final List<XmlElement> results = response.children.whereType<XmlElement>().toList();
     final map = <String, String>{};
     for (XmlElement r in results) {
       map[r.name.local] = r.innerText;
@@ -121,15 +112,12 @@ class StateVariable {
   StateVariable.fromXml(XmlElement e) {
     name = XmlUtils.getTextSafe(e, 'name');
     dataType = XmlUtils.getTextSafe(e, 'dataType');
-    defaultValue =
-        XmlUtils.asValueType(XmlUtils.getTextSafe(e, 'defaultValue'), dataType);
+    defaultValue = XmlUtils.asValueType(XmlUtils.getTextSafe(e, 'defaultValue'), dataType);
     doesSendEvents = e.getAttribute('sendEvents') == 'yes';
   }
 
   String getGenericId() {
-    return sha1
-        .convert(utf8.encode('${service.device!.uuid}::${service.id}::$name'))
-        .toString();
+    return sha1.convert(utf8.encode('${service.device!.uuid}::${service.id}::$name')).toString();
   }
 }
 
@@ -140,16 +128,14 @@ class ActionArgument {
   final String? relatedStateVariable;
   final bool isRetVal;
 
-  ActionArgument(this.action, this.name, this.direction,
-      this.relatedStateVariable, this.isRetVal);
+  ActionArgument(this.action, this.name, this.direction, this.relatedStateVariable, this.isRetVal);
 
   StateVariable? getStateVariable() {
     if (relatedStateVariable != null) {
       return null;
     }
 
-    final Iterable<StateVariable> vars = action.service.stateVariables
-        .where((x) => x.name == relatedStateVariable);
+    final Iterable<StateVariable> vars = action.service.stateVariables.where((x) => x.name == relatedStateVariable);
 
     if (vars.isNotEmpty) {
       return vars.first;
