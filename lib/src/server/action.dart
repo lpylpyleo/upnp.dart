@@ -14,12 +14,13 @@ class UpnpHostAction {
     x.element('action', nest: () {
       x.element('name', nest: name);
       x.element('argumentList', nest: () {
+        // 填充输入参数
         for (var input in inputs) {
           input.applyToXml(x);
         }
-
-        for (var out in outputs) {
-          out.applyToXml(x);
+        // 填充输出参数
+        for (var output in outputs) {
+          output.applyToXml(x);
         }
       });
     });
@@ -37,7 +38,6 @@ class UpnpHostActionArgument {
     x.element('argument', nest: () {
       x.element('name', nest: name);
       x.element('direction', nest: isOutput ? 'out' : 'in');
-
       if (relatedStateVariable != null) {
         x.element('relatedStateVariable', nest: relatedStateVariable);
       }

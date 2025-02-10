@@ -46,7 +46,6 @@ class UpnpServer {
       await request.response.close();
     } else {
       final xml = service.toXml();
-      print(xml.toXmlString());
       request.response
         ..headers.contentType = _xmlType
         ..writeln(xml);

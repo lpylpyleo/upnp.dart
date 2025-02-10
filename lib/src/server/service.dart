@@ -9,8 +9,9 @@ class UpnpHostService {
 
   UpnpHostService({this.type, this.id, this.simpleName});
 
-  XmlNode toXml() {
+  XmlDocument toXml() {
     final x = XmlBuilder();
+    x.processing('xml', 'version="1.0"'); // 添加 XML 声明
     x.element('scpd', nest: () {
       x.namespace('urn:schemas-upnp-org:service-1-0');
       x.element('specVersion', nest: () {
@@ -24,6 +25,6 @@ class UpnpHostService {
         }
       });
     });
-    return x.buildFragment();
+    return x.buildDocument();
   }
 }

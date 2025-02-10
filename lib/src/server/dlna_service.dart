@@ -60,6 +60,12 @@ class DlnaService extends UpnpHostService {
       actions: [
         UpnpHostAction(
           'SetAVTransportURI',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('CurrentURI', false),
+            UpnpHostActionArgument('CurrentURIMetaData', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.setAVTransportURI(SetAVTransportURIInput(
               currentURI: inputs['CurrentURI'] ?? '',
@@ -70,6 +76,20 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetMediaInfo',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('NrTracks', true),
+            UpnpHostActionArgument('MediaDuration', true),
+            UpnpHostActionArgument('CurrentURI', true),
+            UpnpHostActionArgument('CurrentURIMetaData', true),
+            UpnpHostActionArgument('NextURI', true),
+            UpnpHostActionArgument('NextURIMetaData', true),
+            UpnpHostActionArgument('PlayMedium', true),
+            UpnpHostActionArgument('RecordMedium', true),
+            UpnpHostActionArgument('WriteStatus', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getMediaInfo();
             return result.toMap();
@@ -77,6 +97,14 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetTransportInfo',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('CurrentTransportState', true),
+            UpnpHostActionArgument('CurrentTransportStatus', true),
+            UpnpHostActionArgument('CurrentSpeed', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getTransportInfo();
             return result.toMap();
@@ -84,6 +112,19 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetPositionInfo',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('Track', true),
+            UpnpHostActionArgument('TrackDuration', true),
+            UpnpHostActionArgument('TrackMetaData', true),
+            UpnpHostActionArgument('TrackURI', true),
+            UpnpHostActionArgument('RelTime', true),
+            UpnpHostActionArgument('AbsTime', true),
+            UpnpHostActionArgument('RelCount', true),
+            UpnpHostActionArgument('AbsCount', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getPositionInfo();
             return result.toMap();
@@ -91,6 +132,14 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetDeviceCapabilities',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('PlayMedia', true),
+            UpnpHostActionArgument('RecMedia', true),
+            UpnpHostActionArgument('RecQualityModes', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getDeviceCapabilities();
             return result.toMap();
@@ -98,6 +147,13 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetTransportSettings',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('PlayMode', true),
+            UpnpHostActionArgument('RecQualityMode', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getTransportSettings();
             return result.toMap();
@@ -105,6 +161,10 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'Stop',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.stop();
             return {'Result': 'OK'};
@@ -112,6 +172,11 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'Play',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('Speed', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.play(PlayInput(
               currentURI: inputs['CurrentURI'] ?? '',
@@ -122,6 +187,10 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'Pause',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.pause();
             return {'Result': 'OK'};
@@ -129,6 +198,12 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'Seek',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('Unit', false),
+            UpnpHostActionArgument('Target', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.seek(SeekInput(
               relTime: inputs['RelTime'] ?? '00:00:00',
@@ -139,6 +214,10 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'Next',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.next();
             return {'Result': 'OK'};
@@ -146,6 +225,10 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'Previous',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.previous();
             return {'Result': 'OK'};
@@ -165,6 +248,13 @@ class DlnaService extends UpnpHostService {
       actions: [
         UpnpHostAction(
           'GetMute',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('Channel', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('CurrentMute', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getMute(GetMuteInput(
               currentMute: inputs['CurrentMute'] ?? '0',
@@ -174,6 +264,12 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'SetMute',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('Channel', false),
+            UpnpHostActionArgument('DesiredMute', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.setMute(SetMuteInput(
               currentMute: inputs['CurrentMute'] == '1',
@@ -183,6 +279,13 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetVolume',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('Channel', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('CurrentVolume', true),
+          ],
           handler: (inputs) async {
             final result = await handler.getVolume(GetVolumeInput(
               currentVolume: inputs['CurrentVolume'] ?? '100',
@@ -192,6 +295,12 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'SetVolume',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('Channel', false),
+            UpnpHostActionArgument('DesiredVolume', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.setVolume(SetVolumeInput(
               currentVolume: int.parse(inputs['CurrentVolume'] ?? '100'),
@@ -201,6 +310,12 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'ListPresets',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('CurrentPresetNameList', true),
+          ],
           handler: (inputs) async {
             final result = await handler.listPresets();
             return {'CurrentPresetNameList': result};
@@ -208,6 +323,11 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'SelectPreset',
+          inputs: [
+            UpnpHostActionArgument('InstanceID', false),
+            UpnpHostActionArgument('PresetName', false),
+          ],
+          outputs: [],
           handler: (inputs) async {
             await handler.selectPreset(SelectPresetInput(
               currentPresetName: inputs['CurrentPresetName'] ?? '',
@@ -229,6 +349,11 @@ class DlnaService extends UpnpHostService {
       actions: [
         UpnpHostAction(
           'GetProtocolInfo',
+          inputs: [],
+          outputs: [
+            UpnpHostActionArgument('Source', true),
+            UpnpHostActionArgument('Sink', true),
+          ],
           handler: (inputs) async {
             return {
               'Source': handler.getProtocolInfo(),
@@ -238,6 +363,10 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetCurrentConnectionIDs',
+          inputs: [],
+          outputs: [
+            UpnpHostActionArgument('ConnectionIDs', true),
+          ],
           handler: (inputs) async {
             return {
               'ConnectionIDs': '0',
@@ -246,6 +375,18 @@ class DlnaService extends UpnpHostService {
         ),
         UpnpHostAction(
           'GetCurrentConnectionInfo',
+          inputs: [
+            UpnpHostActionArgument('ConnectionID', false),
+          ],
+          outputs: [
+            UpnpHostActionArgument('RcsID', true),
+            UpnpHostActionArgument('AVTransportID', true),
+            UpnpHostActionArgument('ProtocolInfo', true),
+            UpnpHostActionArgument('PeerConnectionManager', true),
+            UpnpHostActionArgument('PeerConnectionID', true),
+            UpnpHostActionArgument('Direction', true),
+            UpnpHostActionArgument('Status', true),
+          ],
           handler: (inputs) async {
             return {
               'RcsID': '0',
