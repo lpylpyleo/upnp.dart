@@ -11,6 +11,7 @@ class DlnaProtocol {
   static const String CONNECTION_MANAGER = 'urn:schemas-upnp-org:service:ConnectionManager:1';
 
   // DLNA设备类型
+  static const String ROOT_DEVICE = 'urn:schemas-upnp-org:device:RootDevice:1';
   static const String MEDIA_RENDERER = 'urn:schemas-upnp-org:device:MediaRenderer:1';
   static const String MEDIA_SERVER = 'urn:schemas-upnp-org:device:MediaServer:1';
   static const String MEDIA_PLAYER = 'urn:schemas-upnp-org:device:MediaPlayer:1';

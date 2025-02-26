@@ -1,7 +1,7 @@
 part of '../../server.dart';
 
 final InternetAddress _v4Multicast = InternetAddress('239.255.255.250');
-final InternetAddress _v6Multicast = InternetAddress('FF05::C');
+// final InternetAddress _v6Multicast = InternetAddress('FF05::C');
 
 class UpnpDiscoveryServer {
   final UpnpHostDevice device;
@@ -22,22 +22,31 @@ class UpnpDiscoveryServer {
       }
     });
 
-    _socket = await RawDatagramSocket.bind('0.0.0.0', 1900);
+    try {
+      _socket = await RawDatagramSocket.bind('0.0.0.0', 1900);
+    } catch (e, stack) {
+      print('Error binding to socket: $e\n$stack');
+      _socket = null;
+      throw Exception('Failed to bind to socket');
+    }
 
     _interfaces = await NetworkInterface.list();
+    List<NetworkInterface> joinedInterfaces = [];
     for (var interface in _interfaces) {
+      if (joinedInterfaces.contains(interface)) continue;
       try {
         _socket!.joinMulticast(_v4Multicast, interface);
-      } on SocketException catch (e, stack) {
-        print('SocketException with IPv4 multicast: $e\n$stack');
-        try {
-          _socket!.joinMulticast(_v6Multicast, interface);
-        } catch (e, stack) {
-          print('Error with IPv6 multicast: $e\n$stack');
-          rethrow;
-        }
+        joinedInterfaces.add(interface);
+      } catch (e) {
+        // ignore
       }
     }
+
+    if (joinedInterfaces.isEmpty) {
+      throw Exception('Failed to join multicast on any interface');
+    }
+
+    print('Joined interfaces: ${joinedInterfaces.map((e) => e.name).join(', ')}');
 
     _socket!.broadcastEnabled = true;
     _socket!.multicastHops = 100;
@@ -52,7 +61,7 @@ class UpnpDiscoveryServer {
           final lines = string.split('\r\n');
           final firstLine = lines.first;
 
-          if (RegExp(r'^M-SEARCH \* HTTP/1\.[01]$', caseSensitive: false).hasMatch(firstLine.trim())) {
+          if (firstLine.trim().toUpperCase().startsWith('M-SEARCH')) {
             final map = <String, String>{};
             for (String line in lines.skip(1)) {
               if (line.trim().isEmpty) continue;
@@ -66,6 +75,7 @@ class UpnpDiscoveryServer {
             if (map['ST'] is String) {
               final search = map['ST'];
               final devices = await respondToSearch(search, packet, map);
+              print('Responding to search for $search devices: ${devices.length}');
               for (var dev in devices) {
                 _socket!.send(utf8.encode(dev), packet.address, packet.port);
               }
@@ -73,7 +83,6 @@ class UpnpDiscoveryServer {
           }
         } catch (e, stack) {
           print('Error processing SSDP packet: $e\n$stack');
-          rethrow;
         }
       }
     });

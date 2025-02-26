@@ -4,7 +4,12 @@ import 'package:upnp2/upnp.dart';
 main() async {
   final disc = DeviceDiscoverer();
   await disc.start(ipv6: false);
-  disc.quickDiscoverClients().listen((client) async {
+  disc
+      .quickDiscoverClients(
+    timeout: null,
+    searchInterval: const Duration(seconds: 3),
+  )
+      .listen((client) async {
     try {
       final dev = await client.getDevice();
       print('Found device: ${dev!.friendlyName}: ${dev.url}');

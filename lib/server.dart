@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' show Random;
+import 'dart:typed_data';
 
 import 'package:xml/xml.dart';
 
